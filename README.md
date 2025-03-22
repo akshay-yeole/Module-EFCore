@@ -27,10 +27,10 @@ dotnet add package Microsoft.EntityFrameworkCore.Tools --version 7.0.0
 
 ## 🛠️ Demo Application Steps
 
-### 0️⃣ **Create a Console Application**  
-After creating the application, install the required packages mentioned above.
+### 1. **Create a Console Application**  
+Create a new console application and install the required packages mentioned above.
 
-### 1️⃣ **📝 Create a Model**  
+### 2. **📝 Create a Model**  
 Define a class to represent your data model. For example:
 
 ```c#
@@ -43,7 +43,7 @@ public class Author
 }
 ```
 
-### 2️⃣ **⚙️ Configure the Database Context**  
+### 3. **⚙️ Configure the Database Context**  
 Set up a `DbContext` class to manage database operations:
 
 ```c#
@@ -58,7 +58,7 @@ public class BookStoreContext : DbContext
 }
 ```
 
-### 3️⃣ **🔍 Query the Database**  
+### 4. **🔍 Query the Database**  
 Perform CRUD operations in your `Program.cs` file. Below is an example implementation:
 
 ```c#
@@ -218,5 +218,21 @@ class Program
 ```
 
 ---
+
+## Using EF Migrations
+
+### Add Migration  
+Run the following command to create a migration:
+
+```bash
+Add-Migration 'InitialMigration'
+```
+
+### Generate Script  
+Generate a SQL script for the migration:
+
+```bash
+Script-Migration
+```
 
 📖 For more details, visit the [official EF Core documentation](https://learn.microsoft.com/en-us/ef/core/).

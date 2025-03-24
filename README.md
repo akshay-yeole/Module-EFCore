@@ -228,11 +228,133 @@ Run the following command to create a migration:
 Add-Migration 'InitialMigration'
 ```
 
+### Update Database  
+Run the following command to apply a migration:
+
+```bash
+Update-Database
+```
+
+### Remove Migration  
+Run the following command to remove a migration:
+
+```bash
+Remove-Migration
+```
+
 ### Generate Script  
 Generate a SQL script for the migration:
 
 ```bash
 Script-Migration
 ```
+
+---
+
+## Data Annotations
+
+Data annotations are used to add constraints to the tables. Below is an example for the `Author` table:
+
+```c#
+public class Author
+{
+    public int Id { get; set; }
+
+    [Required]
+    [StringLength(50)]
+    public string FirstName { get; set; } = string.Empty;
+
+    [Required]
+    [StringLength(50)]
+    public string LastName { get; set; } = string.Empty;
+
+    [Required]
+    [StringLength(50)]
+    public string EmailId { get; set; } = string.Empty;
+
+    [Required]
+    [StringLength(50), MinLength(10)]
+    public string Location { get; set; } = string.Empty;
+}
+```
+
+---
+
+## Relationships in EF Core
+
+### One-to-Many Relationship
+
+Define `Author` and `Book` classes as shown below:
+
+```c#
+public class Author
+{
+    public int Id { get; set; }
+
+    [Required]
+    [StringLength(50)]
+    public string FirstName { get; set; } = string.Empty;
+
+    [Required]
+    [StringLength(50)]
+    public string LastName { get; set; } = string.Empty;
+
+    [Required]
+    [StringLength(50)]
+    public string EmailId { get; set; } = string.Empty;
+
+    public IEnumerable<Book> Books { get; set; }
+}
+```
+
+```c#
+public class Book
+{
+    public int Id { get; set; }
+
+    [Required]
+    public string Title { get; set; }
+
+    [Required]
+    public int Price { get; set; }
+
+    // Navigation Property
+    public Author Author { get; set; }
+}
+```
+
+After defining the relationship, add a migration and run the `Update-Database` command.
+
+---
+
+## Logging in EF Core
+
+To enable logging, install the `Microsoft.Extensions.Logging.Console` package. Update the `BookStoreContext` as follows:
+
+```c#
+public class BookStoreContext : DbContext
+{
+    public static readonly ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+    {
+        builder.AddFilter((category, level) =>
+        {
+            return category == DbLoggerCategory.Database.Command.Name
+                && level == LogLevel.Information;
+        }).AddConsole();
+    });
+
+    public DbSet<Author> Authors { get; set; }
+    public DbSet<Book> Books { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=BookStoreData;Trusted_Connection=True;TrustServerCertificate=True;");
+    }
+}
+```
+
+When you execute any operation, logs will be displayed in the console.
+
+---
 
 📖 For more details, visit the [official EF Core documentation](https://learn.microsoft.com/en-us/ef/core/).

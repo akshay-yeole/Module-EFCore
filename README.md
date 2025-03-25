@@ -1,4 +1,5 @@
-# Entity Framework Core (EF Core)
+# Entity Framework Core
+![Entity Framework Core](https://img.shields.io/badge/-EntityFrameworkCore-512BD4?logo=dotnet&logoColor=white&style=flat)
 
 Entity Framework Core (EF Core) is a modern Object-Relational Mapper (ORM) for .NET applications, enabling developers to work with databases using .NET objects. It simplifies database interactions by abstracting SQL queries and allowing developers to use LINQ and C# objects.
 

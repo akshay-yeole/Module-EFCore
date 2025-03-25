@@ -327,6 +327,157 @@ EF Core provides three ways to define relationships:
 
 ---
 
+### Many to many Relationship using Data anotation
+
+```c#
+ public class Employee
+ {
+     public int Id { get; set; }
+     public string Name { get; set; }
+     public int DepartmentId { get; set; }
+
+     //Navigation property
+     public EmployeeAddress EmployeeAddress { get; set; }
+     public Department Department { get; set; }
+     public IEnumerable<EmployeesInProject> InProjects { get; set; }
+ }
+```
+
+```c#
+public class EmployeeAddress
+{
+    public int Id { get; set; }
+    public string AddressLine1 { get; set; }
+    public string AddressLine2 { get; set; }
+    public string City { get; set; }
+    public int EmployeeId { get; set; }
+     
+    //Navigation property
+    public Employee Employee { get; set; }
+}
+```
+
+```c#
+ public class Department
+ {
+     public int Id { get; set; }
+     public string Name { get; set; }
+
+     //Navigation property
+     public List<Employee> Employees { get; set; }
+ }
+```
+
+```c#
+ public class Project
+ {
+     public int Id { get; set; }
+     public string Name { get; set; }
+     public IEnumerable<EmployeesInProject> InProjects { get; set; }
+ }
+```
+
+```c#
+ public class EmployeesInProject
+ {
+     public int EmployeeId { get; set; }
+     public int ProjectId { get; set; }
+
+     [ForeignKey("EmployeeId")]
+     public Employee Employee { get; set; }
+
+     [ForeignKey("ProjectId")]   
+     public Project Project { get; set; }
+ }
+```
+
+```c#
+ public class EmployeeContext : DbContext
+ {
+     DbSet<Employee> Employees { get; set; }
+     DbSet<Department> Departments { get; set; }
+     DbSet<EmployeeAddress> EmployeeAddresses { get; set; }
+     DbSet<Project> Projects { get; set; }
+     DbSet<EmployeesInProject> EmployeesInProjects { get; set; }
+
+     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+     {
+         optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=EmployeeStore;Trusted_Connection=True;TrustServerCertificate=True;");
+     }
+
+     override protected void OnModelCreating(ModelBuilder modelBuilder)
+     {
+         //One to one relationship
+         modelBuilder.Entity<Employee>()
+             .HasOne(e => e.EmployeeAddress)
+             .WithOne(ea => ea.Employee)
+             .HasForeignKey<EmployeeAddress>(ea => ea.EmployeeId);
+
+         modelBuilder.Entity<EmployeesInProject>()
+             .HasKey(eip => new { eip.EmployeeId, eip.ProjectId });
+     }
+ }
+```
+
+### Many to many Relationship using fluent API
+ ```c#
+  class Student
+  {
+      public int StudentId { get; set; }
+      public string Name { get; set; }
+
+      public IEnumerable<StudentCourse> StudentCourses     { get; set; }
+  }
+
+  class Course
+  {
+      public int CourseId { get; set; }
+      public string Name { get; set; }
+
+      public IEnumerable<StudentCourse> StudentCourses { get; set; }
+
+  }
+
+
+  class StudentCourse
+  {
+      public int StudentId { get; set; }
+      public int CourseId { get; set; }
+      public Student Student { get; set; }
+      public Course Course { get; set; }
+  }
+ ```
+
+ ```c#
+ public class EmployeeContext : DbContext
+{
+    DbSet<Student> Students { get; set; }
+    DbSet<Course> Courses { get; set; }
+    DbSet<StudentCourse> StudentCourses { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=EmployeeStore;Trusted_Connection=True;TrustServerCertificate=True;");
+    }
+
+    override protected void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<StudentCourse>()
+             .HasKey(sc => new { sc.StudentId, sc.CourseId });
+
+        modelBuilder.Entity<StudentCourse>()
+            .HasOne<Student>(sc => sc.Student)
+            .WithMany(s => s.StudentCourses)
+            .HasForeignKey(sc => sc.StudentId);
+
+        modelBuilder.Entity<StudentCourse>()
+            .HasOne<Course>(sc => sc.Course)
+            .WithMany(s => s.StudentCourses)
+            .HasForeignKey(sc => sc.CourseId);
+    }
+}
+ ```
+
 ## Further Reading
 
 📖 For more details, visit the [official EF Core documentation](https://learn.microsoft.com/en-us/ef/core/).

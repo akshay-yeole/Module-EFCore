@@ -576,6 +576,47 @@ internal class Program
 
 4. Run the Application
 
+Stored procedure with parameters
+
+1. To create a stored procedure in SQL Server, you can use the following script:
+```sql
+CREATE PROCEDURE USP_GetOrderDetails(@OrderDetailId as INT)
+AS
+BEGIN
+    SELECT 
+       [OrderDetailId]
+      ,[OrderId]
+      ,[Name]
+      ,[Color]
+      ,[Size]
+  FROM [dbo].[orderDetails] OD
+  WHERE OD.OrderDetailId = @OrderDetailId;
+END
+```
+2. Add Code in Program.cs File
+```c#
+internal class Program
+{
+    private static void Main(string[] args)
+    {
+        using (var context = new ShoppingDBContext())
+        {
+            context.Database.EnsureCreated();
+            SqlParameter sqlParameter = new SqlParameter("@OrderDetailId", 1);
+            FormattableString formattableString = $"EXEC USP_GetOrderDetails {sqlParameter}";
+            var orderDetails = context.orderDetails.FromSql(formattableString);
+
+            foreach (var orderDetail in orderDetails)
+            {
+                Console.WriteLine($"Order ID: {orderDetail.OrderId}, Name: {orderDetail.Name}, Color: {orderDetail.Color}, Size: {orderDetail.Size}");
+            }
+        }
+        Console.ReadLine();
+    }
+}
+```
+3. Run the Application
+   
 ## Further Reading
 
 📖 For more details, visit the [official EF Core documentation](https://learn.microsoft.com/en-us/ef/core/).

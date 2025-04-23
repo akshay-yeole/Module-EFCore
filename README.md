@@ -616,7 +616,36 @@ internal class Program
 }
 ```
 3. Run the Application
-   
+
+Create stored proc using entity framework
+```c#
+internal class Program
+{
+    private static void Main(string[] args)
+    {
+        using (var context = new ShoppingDBContext())
+        {
+            context.Database.EnsureCreated();
+            context.Database.ExecuteSqlRawAsync(@"
+                CREATE PROCEDURE USP_GetOrderDetails(@OrderDetailId as INT)
+                AS
+                BEGIN
+                    SELECT [OrderDetailId]
+                        ,[OrderId]
+                        ,[Name]
+                        ,[Color]
+                        ,[Size]
+                    FROM [dbo].[orderDetails] OD
+                    WHERE OD.OrderDetailId = @OrderDetailId;
+                END
+            ");
+            Console.WriteLine("Stored Procedure Created");
+        }
+        Console.ReadLine();
+    }
+}
+```
+
 ## Further Reading
 
 📖 For more details, visit the [official EF Core documentation](https://learn.microsoft.com/en-us/ef/core/).

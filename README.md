@@ -479,6 +479,103 @@ public class EmployeeAddress
 }
  ```
 
+working with stored procedures
+
+create a stored procedure
+CREATE PROCEDURE USP_GetAllOrderDetails
+AS
+BEGIN
+    SELECT 
+       [OrderDetailId]
+      ,[OrderId]
+      ,[Name]
+      ,[Color]
+      ,[Size]
+  FROM [dbo].[orderDetails]
+END
+
+now add code in program.cs file and run it
+
+internal class Program
+{
+    private static void Main(string[] args)
+    {
+        using (var context = new ShoppingDBContext())
+        {
+            context.Database.EnsureCreated();
+
+            FormattableString formattableString = $"EXEC USP_GetAllOrderDetails";
+            var orderDetails = context.orderDetails.FromSql(formattableString)
+                .AsEnumerable()
+                .Where(x => x.OrderDetailId > 0);
+
+            foreach (var orderDetail in orderDetails)
+            {
+                Console.WriteLine($"Order ID: {orderDetail.OrderId}, Name: {orderDetail.Name}, Color: {orderDetail.Color}, Size: {orderDetail.Size}");
+            }
+        }
+        Console.ReadLine();
+    }
+}
+
+# Working with Stored Procedures
+
+## Create a Stored Procedure
+
+1. A database named `ShoppingDB` containing a table named `orderDetails` with the following columns:
+  - `OrderDetailId`
+  - `OrderId`
+  - `Name`
+  - `Color`
+  - `Size`
+
+2. To create a stored procedure in SQL Server, you can use the following script:
+
+```sql
+CREATE PROCEDURE USP_GetAllOrderDetails
+AS
+BEGIN
+    SELECT 
+       [OrderDetailId],
+       [OrderId],
+       [Name],
+       [Color],
+       [Size]
+    FROM [dbo].[orderDetails]
+END
+```
+3. Add Code in Program.cs File
+```c#
+internal class Program
+{
+    private static void Main(string[] args)
+    {
+        using (var context = new ShoppingDBContext())
+        {
+            // Ensure the database is created
+            context.Database.EnsureCreated();
+
+            // Execute the stored procedure
+            FormattableString formattableString = $"EXEC USP_GetAllOrderDetails";
+            var orderDetails = context.orderDetails.FromSql(formattableString)
+                .AsEnumerable()
+                .Where(x => x.OrderDetailId > 0);
+
+            // Display the results
+            foreach (var orderDetail in orderDetails)
+            {
+                Console.WriteLine($"Order ID: {orderDetail.OrderId}, Name: {orderDetail.Name}, Color: {orderDetail.Color}, Size: {orderDetail.Size}");
+            }
+        }
+
+        // Keep the console open
+        Console.ReadLine();
+    }
+}
+```
+
+4. Run the Application
+
 ## Further Reading
 
 📖 For more details, visit the [official EF Core documentation](https://learn.microsoft.com/en-us/ef/core/).
